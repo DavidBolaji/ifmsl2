@@ -1,0 +1,168 @@
+extends base
+
+block content
+  main
+    // Reservation Form goes here
+    form.booking-form#edit-form
+      .input-group
+        label.form__label(for='clientName')
+          input#clientNameE.form__input(type='text' name='clientName' autocomplete='given-name' placeholder="Enter the Client's name" value=`${booking.clientName}`)
+        label.form__label(for='clientTel')
+          input#clientTelE.form__input(type='tel' name='clientTel' autocomplete='tel' placeholder="Enter the Client's Phone Number" value=`${booking.clientPhoneNumber}`)
+      label.form__label(for='email')
+        input#emailE.form__input(type='email' name='clientEmail' autocomplete='email' placeholder="Enter the Client's email" value=`${booking.clientEmail}`)
+      .input-group
+        label(for='hallname')
+          select#halnameE.form__input(name='hallname', value=`${booking.hallname}` type="text")
+            if booking.hallname === "Africa Hall Conference"
+              option(value="Africa Hall Conference" selected) Africa Hall Conference
+            else
+              option(value="Africa Hall Conference") Africa Hall Conference
+
+            if booking.hallname === "Africa Hall Wedding"
+              option(value="Africa Hall Wedding" selected) Africa Hall Wedding
+            else
+              option(value="Africa Hall Wedding") Africa Hall Wedding
+
+            if booking.hallname === "Africa Hall Galleria"
+              option(value="Africa Hall Galleria" selected) Africa Hall Galleria
+            else
+              option(value="Africa Hall Galleria") Africa Hall Galleria
+
+            if booking.hallname === "Arcade Hall"
+              option(value="Arcade Hall" selected) Arcade Hall
+            else
+              option(value="Arcade Hall") Arcade Hall
+
+            if booking.hallname === "Aso Hall"
+              option(value="Aso Hall" selected) Aso Hall
+            else
+              option(value="Aso Hall") Aso Hall
+
+            if booking.hallname === "Banquet Hall"
+              option(value="Banquet Hall" selected) Banquet Hall
+            else
+              option(value="Banquet Hall") Banquet Hall
+
+            if booking.hallname === "Benue Hall"
+              option(value="Benue Hall" selected) Benue Hall
+            else
+              option(value="Benue Hall") Benue Hall
+            
+            if booking.hallname === "Executive Hall Conference"
+              option(value="Executive Hall Conference" selected) Executive Hall Conference
+            else
+              option(value="Executive Hall Conference") Executive Hall Conference
+
+            if booking.hallname === "Executive Hall Wedding"
+              option(value="Executive Hall Wedding" selected) Executive Hall Wedding
+            else
+              option(value="Executive Hall Wedding") Executive Hall Wedding
+
+            if booking.hallname === "Executive Lounge"
+              option(value="Executive Lounge" selected) Executive Lounge
+            else
+              option(value="Executive Lounge") Executive Lounge
+
+            if booking.hallname === "Niger Hall"
+              option(value="Niger Hall" selected) Niger Hall
+            else
+              option(value="Niger Hall") Niger Hall
+            
+            if booking.hallname === "Office Space"
+              option(value="Office Space" selected) Office Space
+            else
+              option(value="Office Space") Office Space
+
+            if booking.hallname === "Suleja Garden"
+              option(value="Suleja Garden" selected) Suleja Garden
+            else
+              option(value="Suleja Garden") Suleja Garden
+
+            if booking.hallname === "Taraba Hall"
+              option(value="Taraba Hall" selected) Taraba Hall
+            else
+              option(value="Taraba Hall") Taraba Hall
+        label(for='attendance')
+          input#attendanceE.form__input(type='number' name='attendance' placeholder='Enter the event Attendance' min='5' max='3000' value=`${booking.attendance}`)
+      .input-group_money
+        label(for='total')
+          span &#8358
+          input.total(type="text", name="total" value=`${new Intl.NumberFormat().format(booking.total)}`)
+        label(for='paid') 
+          if booking.paid === "paid"
+            select#paid(name="paid")
+              option(value="unpaid") Unpaid 
+              option(value="deposit") Deposit 
+              option(value="paid" selected) Fully Paid 
+          else if booking.paid === "deposit" 
+            select#paid(name="paid")
+              option(value="unpaid") Unpaid 
+              option(value="deposit" selected) Deposit 
+              option(value="paid") Fully Paid 
+          else
+            select#paid(name="paid")
+              option(value="unpaid" selected) Unpaid 
+              option(value="deposit") Deposit 
+              option(value="paid") Fully Paid 
+      .sessionE_p 
+        p Please note that if you do not check either of this box then you will be booked for both morning and evening sessions
+      .inputE-session
+        if booking.sessions[0] === "morning" 
+          div 
+            label(for='session') morning (6:00am - 2:00pm)
+            input#sessionE__input_m(type='checkbox' name='morning' value='morning' checked)
+          div 
+            label(for='session') evening  (4:00pm - 12:00am)
+            input#sessionE__input_e(type='checkbox' name='morning' value='evening')
+        else 
+          if booking.sessions[0] === "evening" 
+            div 
+              label(for='session') morning (6:00am - 2:00pm)
+              input#sessionE__input_m(type='checkbox' name='morning' value='morning')
+            div 
+              label(for='session') evening  (4:00pm - 12:00am)
+              input#sessionE__input_e(type='checkbox' name='morning' value='evening' checked)
+          else 
+            div 
+              label(for='session') morning (6:00am - 2:00pm)
+              input#sessionE__input_m(type='checkbox' name='morning' value='morning')
+            div 
+              label(for='session') evening  (4:00pm - 12:00am)
+              input#sessionE__input_e(type='checkbox' name='morning' value='evening')
+      .payment__details 
+        .payment__amount Amount:$5000
+        .payment__charge charge: $500(10%)
+        .payment__vat VAT: $375(7.5%)
+        .payment__refund Refundable Caution: $440 000
+        .payment__total Total: $5875 
+      label.form__label(for='event')
+        textarea#eventE.form__textarea(name='event' placeholder='Event Description' maxlength='500' minlength='5') #{booking.event}
+      div.calender__container_edit
+        div.calender__calender_edit
+          div.calender__month_edit
+            div.calender__left_arrow_edit
+              i(class='fas fa-angle-left')
+            div.calender__month_group_edit
+              h1  
+              p 
+            div.calender__right_arrow_edit
+              i(class='fas fa-angle-right')
+          div.calender__weekdays_edit
+            div Sun
+            div Mon
+            div Tue
+            div Wed
+            div Thur
+            div Fri
+            div Sat
+          div.calender__days_edit
+      form
+        .coupon 
+          input.payment__discount(placeholder="Enter Discount" oninput="isNumber(this.value)")
+          button(type="submit" class="coupon__input") Apply
+        .input-group
+          label.form__label
+            button#updateOne.form__input.bg-green UPDATE
+          label.form__label
+            button#deleteOne.form__input.bg-red DELETE
