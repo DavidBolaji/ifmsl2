@@ -239,6 +239,8 @@ exports.updateBooking = async (req, res, next) => {
     const { id, user } = req.params;
     const booking = await Booking.findById(id);
 
+    console.log(booking.user, user);
+
     if (booking.user != user) {
       return next(new CustomError(401, "Unauthorized"));
     }

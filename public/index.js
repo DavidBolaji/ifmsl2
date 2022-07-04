@@ -1308,6 +1308,28 @@ if (calenderContEdit) {
 
       // get input values
       let bookedData = UIEctrl.getBookedValueE();
+
+      for (const val in bookedData) {
+        console.log(val);
+        if (val === "clientName" && bookedData[val] === "") {
+          console.log("entered");
+          return UIctrl.showAlert("error", "Client Name cannot be empty");
+        } else if (val === "clientTel" && bookedData[val] === "") {
+          return UIctrl.showAlert("error", "Client Number cannot be empty");
+        } else if (val === "event" && bookedData[val] === "") {
+          return UIctrl.showAlert("error", "Event description cannot be empty");
+        } else if (val === "clientEmail") {
+          let regex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
+
+          if (bookedData[val] === "") {
+            return UIctrl.showAlert("error", "Email cannot be empty");
+          } else if (!regex.test(bookedData[val])) {
+            return UIctrl.showAlert("error", "Please Enter a valid Email");
+          }
+        } else if (val === "attendance" && bookedData[val] === "") {
+          return UIctrl.showAlert("error", "Attendance cannot be empty");
+        }
+      }
       // store the booked values
       calECtrl.getbookedData(bookedData, (booked) => {
         console.log(booked);
@@ -1332,7 +1354,14 @@ if (calenderContEdit) {
             }
           })
           .catch((e) => {
-            UIEctrl.showAlert("error", e);
+            UIctrl.disableBtn();
+            Array.from(document.querySelectorAll(".active")).forEach(
+              (active) => {
+                active.classList.remove("active");
+              }
+            );
+            renderAndAddEvent();
+            UIEctrl.showAlert("error", res.response.data.error);
           });
       });
     });
