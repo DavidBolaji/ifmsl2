@@ -149,6 +149,45 @@ exports.createBooking = async (req, res, next) => {
 };
 
 exports.multipleBooking = async (req, res, next) => {
+  const arr = ["morning", "evening"];
+  const f = await Booking.find({
+    bookedFrom: req.body[0].bookedFrom,
+    hallname: req.body[0].hallname,
+  });
+
+  console.log(f);
+
+  const newF = f.map((r) => r.sessions[0]);
+
+  console.log(newF);
+
+  if (newF.length !== 0 && typeof newF[0] === "undefined") {
+    return next(new CustomError(400, "Day is fully booked"));
+  }
+
+  const valid = arr.every((el) => newF.includes(el));
+
+  if (newF.length !== 0 && valid) {
+    return next(new CustomError(400, "Day is fully booked"));
+  }
+
+  if (f.length > 0) {
+    if (f[0].sessions[0] === req.body[0].sessions[0]) {
+      return `${
+        f[0].sessions[0] === "morning"
+          ? next(new CustomError(400, "Morning is already booked"))
+          : next(new CustomError(400, "Evening is already booked"))
+      } `;
+    } else {
+      if (req.body[0].sessions.length === 0)
+        return `${
+          f[0].sessions[0] === "morning"
+            ? next(new CustomError(400, "You can only book Evening"))
+            : next(new CustomError(400, "You can only book Morning"))
+        } `;
+    }
+  }
+
   const hol = req.body.map((e) => {
     return {
       ...e,
@@ -157,7 +196,21 @@ exports.multipleBooking = async (req, res, next) => {
   });
 
   try {
-    const newBooking = await Booking.insertMany(hol);
+    const newBooking = await Booking.create({
+      user: hol[0].user,
+      clientName: hol[0].clientName,
+      clientEmail: hol[0].clientEmail,
+      clientPhoneNumber: hol[0].clientPhoneNumber,
+      hallname: hol[0].hallname,
+      event: hol[0].event,
+      attendance: hol[0].attendance,
+      bookedFrom: hol[0].bookedFrom,
+      bookedTo: hol[0].bookedTo,
+      total: hol[0].total,
+      paid: hol[0].paid,
+      discount: hol[0].discount,
+      sessions: hol[0].sessions,
+    });
     if (!newBooking) {
       return next(new CustomError(400, "Error processing your request"));
     }
@@ -251,6 +304,7 @@ exports.deleteSingleBooking = async (req, res, next) => {
         total: bookBin[0].total,
         discount: bookBin[0].discount,
         user: bookBin[0].user,
+        sessions: bookBin[0].sessions,
       });
 
       //   if (!bin) throw new Error("ERROR");
@@ -464,6 +518,39 @@ exports.getUnfilteredBookings = async (req, res, next) => {
     } else if (search === "bookedFrom") {
       booking = await Booking.find({ bookedFrom: { $gte: new Date(value) } });
     }
+
+    responseHandler(res, 200, {
+      count: JSON.stringify(count),
+      booking,
+    });
+  } catch (error) {
+    return next(
+      new CustomError(
+        500,
+        "Seems like an error processing your request...",
+        error
+      )
+    );
+  }
+
+  // responseHandler(res, 200, hall);
+};
+
+exports.getUnfilteredBookings2 = async (req, res, next) => {
+  const { valueF, valueT } = req.params;
+  try {
+    const count = await Booking.estimatedDocumentCount(req.query, function (
+      err,
+      count
+    ) {
+      return count;
+    });
+    let booking;
+
+    booking = await Booking.find({
+      bookedFrom: { $gte: new Date(valueF) },
+      bookedTo: { $lte: new Date(valueT) },
+    });
 
     responseHandler(res, 200, {
       count: JSON.stringify(count),

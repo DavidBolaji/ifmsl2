@@ -67,6 +67,9 @@ const BinSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  sessions: {
+    type: [String],
+  },
   bookedFrom: Date,
   bookedTo: {
     type: Date,
@@ -78,38 +81,38 @@ const BinSchema = new mongoose.Schema({
   },
 });
 
-BinSchema.pre("save", async function (next) {
-  const bins = await this.collection
-    .aggregate([
-      {
-        $match: { hallname: this.hallname },
-      },
-      {
-        $project: {
-          hallname: 1,
-          bookedFrom: 1,
-          bookedTo: 1,
-        },
-      },
-    ])
-    .toArray();
-  bins.some((bin) => {
-    let results = overalappingDates([
-      {
-        start: bin.bookedFrom,
-        end: bin.bookedTo,
-      },
-      {
-        start: this.bookedFrom,
-        end: this.bookedTo,
-      },
-    ]);
-    if (results.overlap === true) {
-      return next(new CustomError(11000, "Duplicate Entry", results));
-    }
-  });
-  next();
-});
+// BinSchema.pre("save", async function (next) {
+//   const bins = await this.collection
+//     .aggregate([
+//       {
+//         $match: { hallname: this.hallname },
+//       },
+//       {
+//         $project: {
+//           hallname: 1,
+//           bookedFrom: 1,
+//           bookedTo: 1,
+//         },
+//       },
+//     ])
+//     .toArray();
+//   bins.some((bin) => {
+//     let results = overalappingDates([
+//       {
+//         start: bin.bookedFrom,
+//         end: bin.bookedTo,
+//       },
+//       {
+//         start: this.bookedFrom,
+//         end: this.bookedTo,
+//       },
+//     ]);
+//     if (results.overlap === true) {
+//       return next(new CustomError(11000, "Duplicate Entry", results));
+//     }
+//   });
+//   next();
+// });
 
 const Bin = mongoose.model("Bin", BinSchema);
 

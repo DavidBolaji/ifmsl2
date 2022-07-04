@@ -814,6 +814,12 @@ if (calenderContEdit) {
           data.data.data[0].hallname
         }</p><p>Phone Number: ${
           data.data.data[0].clientPhoneNumber
+        }</p><p>session: ${
+          data.data.data[0].sessions[0] === "morning"
+            ? "Morning"
+            : data.data.data[0].sessions[0] === "evening"
+            ? "Evening"
+            : "Whole Day"
         }</p><p>from: ${new Date(
           data.data.data[0].bookedFrom
         ).toDateString()}</p><p>To: ${new Date(
@@ -1110,7 +1116,7 @@ if (calenderContEdit) {
           !calECtrl.returnFilterAndStartDate().dbBookedDays.includes(div.id)
       );
 
-      // console.log(newFilter);
+      console.log(newFilter);
       // modal.classList.remove('active')
       Array.from(document.querySelectorAll(".calender__days_edit div")).forEach(
         (div) => {
@@ -1369,11 +1375,7 @@ if (calenderCont) {
       "Dec",
     ];
     let indexOfFirstDay = new Date(date.getFullYear(), month, 1).getDay();
-    let lastDayIndex = new Date(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      0
-    ).getDay();
+
     let prevLatDay = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
     let lastDay = new Date(
       date.getFullYear(),
@@ -1390,6 +1392,8 @@ if (calenderCont) {
     let dbStartDays = [];
 
     let bookingDates = [];
+
+    let partBooked = [];
 
     let booked = [];
 
@@ -1644,9 +1648,10 @@ if (calenderCont) {
             }
           );
           console.log(res);
-          //   return res;
+          return res;
         } catch (error) {
-          return "error";
+          console.log(error);
+          return error;
         }
       },
 
@@ -1683,6 +1688,7 @@ if (calenderCont) {
         }
 
         console.log(dbStartDays);
+        console.log(dbBookedDays);
       },
 
       convertBookedArr: function () {
@@ -1701,7 +1707,7 @@ if (calenderCont) {
           }
         });
 
-        // console.log(dbBookedDays, dbStartDays);
+        console.log(dbBookedDays, dbStartDays);
       },
 
       addDate: function (date, hall, cb) {
@@ -1874,6 +1880,8 @@ if (calenderCont) {
             method: "GET",
             url: `${window.location.protocol}//${window.location.host}/api/v1/bookingss/getavailability/halls/${hallname}/from/${from}/to/${to}`,
           });
+
+          console.log(res);
           return res;
         } catch (error) {
           // showAlert('error', error.response.data.message);
@@ -2112,6 +2120,12 @@ if (calenderCont) {
         };
       },
 
+      disableBtn: function () {
+        document
+          .querySelector(".form__input.bg-green")
+          .classList.toggle("disabled");
+      },
+
       showModal: function (data) {
         modal.innerHTML = `<h2>${
           data.data.data[0].clientName
@@ -2122,6 +2136,12 @@ if (calenderCont) {
           data.data.data[0].hallname
         }</p><p>Phone Number: ${
           data.data.data[0].clientPhoneNumber
+        }</p><p>session: ${
+          data.data.data[0].sessions[0] === "morning"
+            ? "Morning"
+            : data.data.data[0].sessions[0] === "evening"
+            ? "Evening"
+            : "Whole Day"
         }</p><p>from: ${new Date(
           data.data.data[0].bookedFrom
         ).toDateString()}</p><p>To: ${new Date(
@@ -2413,13 +2433,10 @@ if (calenderCont) {
 
       let newFilter = Array.from(
         document.querySelectorAll(".calender__days div")
-      ).filter(
-        (div) =>
-          !calCtrl.returnFilterAndStartDate().dbBookedDays.includes(div.id)
       );
 
-      // console.log(newFilter);
-      // modal.classList.remove('active')
+      console.log(newFilter);
+      modal.classList.remove("active");
       Array.from(document.querySelectorAll(".calender__days div")).forEach(
         (div) => {
           calCtrl.returnFilterAndStartDate().dbStartDays.forEach((sDay) => {
@@ -2613,6 +2630,31 @@ if (calenderCont) {
         // get input values
         let bookedData = UIctrl.getBookedValue();
 
+        for (const val in bookedData) {
+          console.log(val);
+          if (val === "clientName" && bookedData[val] === "") {
+            console.log("entered");
+            return UIctrl.showAlert("error", "Client Name cannot be empty");
+          } else if (val === "clientTel" && bookedData[val] === "") {
+            return UIctrl.showAlert("error", "Client Number cannot be empty");
+          } else if (val === "event" && bookedData[val] === "") {
+            return UIctrl.showAlert(
+              "error",
+              "Event description cannot be empty"
+            );
+          } else if (val === "clientEmail") {
+            let regex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
+
+            if (bookedData[val] === "") {
+              return UIctrl.showAlert("error", "Email cannot be empty");
+            } else if (!regex.test(bookedData[val])) {
+              return UIctrl.showAlert("error", "Please Enter a valid Email");
+            }
+          } else if (val === "attendance" && bookedData[val] === "") {
+            return UIctrl.showAlert("error", "Attendance cannot be empty");
+          }
+        }
+
         console.log(bookedData);
         calCtrl.setHall(bookedData.hallname);
 
@@ -2622,38 +2664,25 @@ if (calenderCont) {
 
         const multipleData = calCtrl.returnMultiple();
 
-        calCtrl
-          .submitData(multipleData)
-          .then((res) => {
-            console.log(res);
-            // if (res.status === 201) {
-            //   UIctrl.showAlert("success", "Booking successful");
-            //   window.setTimeout(() => {
-            //     location.assign("/bookings");
-            //   }, 1500);
-            // }
-          })
-          .catch((e) => {
-            showAlert("error", e.response.data.error);
-          });
-
-        // store the booked values
-        // calCtrl.getbookedData(bookedData, (booked) => {
-
-        //     console.log(booked);
-
-        //     console.log(bookedData);
-        //     calCtrl.submitData(booked).then(res => {
-        //         if (res.status === 201) {
-        //             UIctrl.showAlert('success', 'Booking successful');
-        //             window.setTimeout(() => {
-        //                 location.assign('/bookings');
-        //             }, 1500);
-        //         }
-        //     }).catch(e => {
-        //         showAlert('error', e.response.data.error);
-        //     })
-        // })
+        calCtrl.submitData(multipleData).then((res) => {
+          UIctrl.disableBtn();
+          console.log(res);
+          if (res?.data?.status === "success") {
+            UIctrl.showAlert("success", "Booking successful");
+            window.setTimeout(() => {
+              location.assign("/bookings");
+            }, 1500);
+          } else {
+            UIctrl.disableBtn();
+            Array.from(document.querySelectorAll(".active")).forEach(
+              (active) => {
+                active.classList.remove("active");
+              }
+            );
+            renderAndAddEvent();
+            showAlert("error", res.response.data.error);
+          }
+        });
       });
 
     var date = calCtrl.returnDate();
@@ -2960,6 +2989,12 @@ const UIPageController = (function () {
         data.data.data[0].hallname
       }</p><p>Phone Number: ${
         data.data.data[0].clientPhoneNumber
+      }</p><p>session: ${
+        data.data.data[0].sessions[0] === "morning"
+          ? "Morning"
+          : data.data.data[0].sessions[0] === "evening"
+          ? "Evening"
+          : "Whole Day"
       }</p><p>from: ${new Date(
         data.data.data[0].bookedFrom
       ).toDateString()}</p><p>To: ${new Date(
@@ -3201,6 +3236,9 @@ if (document.querySelector(".tab")) {
     inputFilter ? (inputFilter.value = "") : null;
     const selectFilter = document.querySelector(".select-book");
     const btnSub = document.querySelector(".btn-submit");
+    const rangeFrom = document.querySelector(".range_from");
+    const rangeTo = document.querySelector(".range_to");
+    const rangeSubmit = document.querySelector("#rangeB");
     let start = true;
 
     // get the quotes from API
@@ -3254,6 +3292,27 @@ if (document.querySelector(".tab")) {
       }
     };
 
+    const getUnfiltered2 = async (valueF, valueT) => {
+      try {
+        // const res = await axios({
+        //   method: "GET",
+        //   url: `${window.location.protocol}//${window.location.host}/api/v1/no-filter/bookings/search/bookedFrom/${valueF}/bookedTo/${valueT}`,
+        // });
+        const response = await fetch(
+          `${window.location.protocol}//${window.location.host}/api/v1/no-filter/bookings/search/bookedFrom/${valueF}/bookedTo/${valueT}`,
+          {
+            method: "GET",
+          }
+        );
+
+        const res = response.json();
+
+        return res;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     count = 0;
 
     const setFilter = (val) => {
@@ -3300,11 +3359,13 @@ if (document.querySelector(".tab")) {
             : value.sessions[0] === "evening"
             ? "Evening"
             : "Whole Day"
-        }</td><td>${value.discount}%</td><td><i onClick="runDelete(this)" id=${
+        }</td><td>${value.discount}%</td><td><i onClick="runDelete(this,'${
+          value.clientName
+        }')" id=${
           value._id
-        }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><a onClick="return confirm('are you sure you want to update')" href="/bookings/${
-          value._id
-        }"><i id=${
+        }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><a onClick="return confirm('are you sure you want to update ${
+          value.clientName
+        }')" href="/bookings/${value._id}"><i id=${
           value._id
         }  class="fa fa-edit" style="color:#20bf6b;display: flex;justify-content: center;cursor: pointer"></i></a></td></tr>`;
       });
@@ -3329,9 +3390,19 @@ if (document.querySelector(".tab")) {
           !value.paid ? "unpaid" : "paid"
         }</td><td style="white-space: nowrap">&#8358 ${new Intl.NumberFormat().format(
           value.total
-        )}</td><td>${value.discount}%</td><td><i onClick="runDelete(this)" id=${
+        )}</td><td>${
+          value.sessions[0] === "morning"
+            ? "Morning"
+            : value.sessions[0] === "evening"
+            ? "Evening"
+            : "Whole Day"
+        }</td><td>${value.discount}%</td><td><i onClick="runDelete(this,'${
+          value.clientName
+        }')" id=${
           value._id
-        }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><a onClick="return confirm('are you sure you want to update')" href="/bookings/${
+        }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><a onClick="return confirm('are you sure you want to update ${
+          value.clientName
+        }')" href="/bookings/${
           value._id
         }"><i class="fa fa-edit" style="color:#20bf6b;display: flex;justify-content: center;cursor: pointer"></i></a></td></tr>`;
       });
@@ -3387,11 +3458,22 @@ if (document.querySelector(".tab")) {
       });
     };
 
+    const filterScript2 = (e) => {
+      showLoader();
+      // console.log(queryVal,inputFilter.value);
+
+      getUnfiltered2(rangeFrom.value, rangeTo.value).then((data) => {
+        console.log(data.data.booking);
+        showQuotesF(data.data.booking);
+      });
+    };
+
     const changeScript = () => {
       queryVal = selectFilter.value;
     };
 
     btnSub ? btnSub.addEventListener("click", filterScript) : null;
+    rangeSubmit ? rangeSubmit.addEventListener("click", filterScript2) : null;
     selectFilter ? selectFilter.addEventListener("change", changeScript) : null;
 
     // control variables
@@ -3514,9 +3596,9 @@ if (document.querySelector(".bin")) {
           !value.paid ? "unpaid" : "paid"
         }</td><td style="white-space: nowrap">&#8358 ${new Intl.NumberFormat().format(
           value.total
-        )}</td><td>${
-          value.discount
-        }%</td><td><i onClick="runDeleteP(this)" id=${
+        )}</td><td>${value.discount}%</td><td><i onClick="runDeleteP(this,'${
+          value.clientName
+        }')" id=${
           value._id
         }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><i id=${
           value._id
@@ -3555,9 +3637,9 @@ if (document.querySelector(".bin")) {
           !value.paid ? "unpaid" : "paid"
         }</td><td style="white-space: nowrap">&#8358 ${new Intl.NumberFormat().format(
           value.total
-        )}</td><td>${
-          value.discount
-        }%</td><td><i onClick="runDeleteP(this)" id=${
+        )}</td><td>${value.discount}%</td><td><i onClick="runDeleteP(this,'${
+          value.clientName
+        }')" id=${
           value._id
         }  class="fa fa-trash" style="color:#eb4d4b;display: flex;justify-content: center;cursor: pointer"></i><td><i id=${
           value._id
@@ -3660,8 +3742,8 @@ if (document.querySelector(".bin")) {
 }
 
 // Delete from table
-const runDelete = (e) => {
-  if (confirm("Are you sure you want to delete")) {
+const runDelete = (e, name) => {
+  if (confirm(`Are you sure you want to delete ${name}`)) {
     deleteOneBook(e.id, localStorage.getItem("user_delete_id"));
   } else {
     console.log("no");
@@ -3669,8 +3751,8 @@ const runDelete = (e) => {
 };
 
 // Delete from Bin
-const runDeleteP = (e) => {
-  if (confirm("Are you sure you want to delete permanently")) {
+const runDeleteP = (e, name) => {
+  if (confirm(`Are you sure you want to delete ${name} permanently`)) {
     deletePermanently(e.id);
   } else {
     console.log("no");

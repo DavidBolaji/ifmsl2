@@ -950,6 +950,47 @@ tr:nth-child(even) {
   display: flex;
 }
 
+.disabled {
+  cursor: not-allowed;
+  
+}
+
+.range {
+  display: none;
+}
+
+.range.active {
+  margin-bottom: 20px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+.range-two {
+  margin-left: 20px;
+}
+
+.range-one label,
+.range-two label {
+  margin-right: 5px;
+}
+
+.range input {
+  margin-left: 5px;
+  padding: 5px 15px;
+}
+
+.range button {
+  padding: 5px 15px;
+  margin-left: 10px;
+  background-color: #5bc0de;
+  color: #fff;
+  border: 1px solid #5bc0de;
+  cursor: pointer;
+}
+
 /* 
 * ======== END LOGIN FORM ==========
 */
