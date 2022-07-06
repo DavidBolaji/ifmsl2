@@ -3376,10 +3376,10 @@ if (document.querySelector(".tab")) {
           value.bookedTo
         ).toDateString()}</td><td>${
           value.paid === "unpaid"
-            ? "Unpaid"
+            ? "unpaid"
             : value.paid === "deposit"
             ? "Deposit"
-            : "Paid"
+            : "paid"
         }</td><td style="white-space: nowrap">&#8358 ${new Intl.NumberFormat().format(
           value.total
         )}</td><td>${

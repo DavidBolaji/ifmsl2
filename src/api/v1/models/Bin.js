@@ -6,35 +6,35 @@ const CustomError = require("../../utils/CustomError");
 const BinSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    required: true,
+    // required: true,
   },
   clientName: {
     type: String,
-    required: [true, "A user must have a name"],
-    trim: true,
-    minlength: [1, "A user name must have more than 8 characters"],
-    maxlength: [100, "A user name must not have more than 40 characters "],
+    // required: [true, "A user must have a name"],
+    // trim: true,
+    // minlength: [1, "A user name must have more than 8 characters"],
+    // maxlength: [100, "A user name must not have more than 40 characters "],
   },
   clientEmail: {
     type: String,
-    validate: {
-      validator: function (email) {
-        return validator.isEmail(email);
-      },
-      message: "Invalid email supplied",
-    },
-    trim: true,
-    lowercase: true,
-    required: [true, "This field is required"],
+    // validate: {
+    //   validator: function (email) {
+    //     return validator.isEmail(email);
+    //   },
+    //   message: "Invalid email supplied",
+    // },
+    // trim: true,
+    // lowercase: true,
+    // required: [true, "This field is required"],
   },
   clientPhoneNumber: {
     type: String,
-    validate: {
-      validator: function (val) {
-        return validator.isMobilePhone(val, "any");
-      },
-      message: "Invalid phone number supplied",
-    },
+    // validate: {
+    //   validator: function (val) {
+    //     return validator.isMobilePhone(val, "any");
+    //   },
+    //   message: "Invalid phone number supplied",
+    // },
   },
   hallname: {
     type: String,
@@ -51,7 +51,7 @@ const BinSchema = new mongoose.Schema({
   },
   attendance: {
     type: Number,
-    min: [5, "Attendance cannot be less than 5"],
+    // min: [5, "Attendance cannot be less than 5"],
     max: [3000, "Due to health regulations, attendance must be less than 3000"],
     default: 100,
   },
@@ -62,6 +62,7 @@ const BinSchema = new mongoose.Schema({
   total: {
     type: Number,
     required: true,
+    default: 0
   },
   discount: {
     type: Number,

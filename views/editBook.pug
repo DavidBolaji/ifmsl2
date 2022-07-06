@@ -92,19 +92,19 @@ block content
         label(for='paid') 
           if booking.paid === "paid"
             select#paid(name="paid")
-              option(value="unpaid") Unpaid 
+              option(value="unpaid") unpaid 
               option(value="deposit") Deposit 
-              option(value="paid" selected) Fully Paid 
+              option(value="paid" selected) Fully paid 
           else if booking.paid === "deposit" 
             select#paid(name="paid")
-              option(value="unpaid") Unpaid 
+              option(value="unpaid") unpaid 
               option(value="deposit" selected) Deposit 
-              option(value="paid") Fully Paid 
+              option(value="paid") Fully paid 
           else
             select#paid(name="paid")
-              option(value="unpaid" selected) Unpaid 
+              option(value="unpaid" selected) unpaid 
               option(value="deposit") Deposit 
-              option(value="paid") Fully Paid 
+              option(value="paid") Fully paid 
       .sessionE_p 
         p Please note that if you do not check either of this box then you will be booked for both morning and evening sessions
       .inputE-session
