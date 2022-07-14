@@ -8640,7 +8640,7 @@ var showAlert = function showAlert(type, message, delayed) {
 
 var monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 console.log(monthArr.indexOf("Jan"));
-var Calendar = tui.Calendar;
+var Calendar = tui?.Calendar;
 var calenderMntGrpH1 = document.querySelector(".calender-month h2");
 var calenderMntGrpP = document.querySelector(".calender-month p");
 var navLeft = document.querySelector(".nav-left i");
