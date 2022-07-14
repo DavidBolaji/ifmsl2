@@ -97,6 +97,12 @@ router.delete(
   bookingsController.croneDelete
 );
 
+router.delete(
+  "/bookings/bin/delete",
+  protect,
+  bookingsController.deleteBin
+);
+
 router
   .route("/bookings/:id/:user")
   .get(protect, bookingsController.getSingleBooking)

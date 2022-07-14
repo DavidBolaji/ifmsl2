@@ -46,15 +46,6 @@ block content
         div 
           label(for='session') evening  (4:00pm - 12:00am)
           input#session__input_e(type='checkbox' name='morning' value='evening')
-      .payment__details 
-        .payment__amount Amount:$5000
-        .payment__charge charge: $500(10%)
-        .payment__vat VAT: $375(7.5%)
-        .payment__refund Refundable Caution: $440 000
-        .payment__total Total: $5875
-
-      label.form__label(for='event')
-        textarea#event.form__textarea(name='event' placeholder='Event Description' maxlength='500' minlength='5')
       div.calender__container
         div.calender__calender
           div.calender__month
@@ -74,6 +65,16 @@ block content
             div Fri
             div Sat
           div.calender__days
+      .payment__details 
+        .payment__amount Amount:$5000
+        .payment__charge charge: $500(10%)
+        .payment__vat VAT: $375(7.5%)
+        .payment__refund Refundable Caution: $440 000
+        .payment__total Total: $5875
+
+      label.form__label(for='event')
+        textarea#event.form__textarea(name='event' placeholder='Event Description' maxlength='500' minlength='5')
+      
             
             
       //- .input-group

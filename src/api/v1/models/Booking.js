@@ -89,38 +89,38 @@ const BookingSchema = new mongoose.Schema(
   }
 );
 
-BookingSchema.pre("save", async function (next) {
-  const bookings = await this.collection
-    .aggregate([
-      {
-        $match: { hallname: this.hallname },
-      },
-      {
-        $project: {
-          hallname: 1,
-          bookedFrom: 1,
-          bookedTo: 1,
-        },
-      },
-    ])
-    .toArray();
-  bookings.some((book) => {
-    let results = overalappingDates([
-      {
-        start: book.bookedFrom,
-        end: book.bookedTo,
-      },
-      {
-        start: this.bookedFrom,
-        end: this.bookedTo,
-      },
-    ]);
-    if (results.overlap === true) {
-      return next(new CustomError(11000, "Duplicate Entry", results));
-    }
-  });
-  next();
-});
+// BookingSchema.pre("save", async function (next) {
+//   const bookings = await this.collection
+//     .aggregate([
+//       {
+//         $match: { hallname: this.hallname },
+//       },
+//       {
+//         $project: {
+//           hallname: 1,
+//           bookedFrom: 1,
+//           bookedTo: 1,
+//         },
+//       },
+//     ])
+//     .toArray();
+//   bookings.some((book) => {
+//     let results = overalappingDates([
+//       {
+//         start: book.bookedFrom,
+//         end: book.bookedTo,
+//       },
+//       {
+//         start: this.bookedFrom,
+//         end: this.bookedTo,
+//       },
+//     ]);
+//     // if (results.overlap === true) {
+//     //   return next(new CustomError(11000, "Duplicate Entry", results));
+//     // }
+//   });
+//   next();
+// });
 
 BookingSchema.statics.validateSession = async function (sess) {
   const book = this;

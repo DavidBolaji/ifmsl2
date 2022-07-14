@@ -1,4 +1,4 @@
-// calender dom Elements
+// calender dom Elementsnav
 const calenderCont = document.querySelector(".calender__container");
 const calenderCal = document.querySelector(".calender__calender");
 const calenderMnt = document.querySelector(".calender__month");
@@ -342,7 +342,7 @@ if (calenderContEdit) {
 
           return res;
         } catch (error) {
-          return "error";
+          return error;
         }
       },
 
@@ -696,8 +696,6 @@ if (calenderContEdit) {
           }`;
         }
 
-        console.log(val);
-
         try {
           const res = await axios({
             method: "GET",
@@ -734,14 +732,10 @@ if (calenderContEdit) {
             { withCredentials: true }
           );
 
-          if (res.status === 201) {
-            return res;
-          }
+          return res;
+          
         } catch (error) {
-          if (error.response.status === 401) {
-            return "Unauthorized";
-          }
-          return "Please select a date";
+          return error
         }
       },
     };
@@ -805,26 +799,30 @@ if (calenderContEdit) {
       },
 
       showModal: function (data) {
-        modal.innerHTML = `<h2>${
-          data.data.data[0].clientName
-        }</h2><center><p>Email: ${data.data.data[0].clientEmail}</p></center>
+        modal.innerHTML= `<div class="mod-group"><div>`
+       data.data.data.forEach(el => {
+         let innerHTML = `<h2>${
+          el.clientName
+        }</h2><center><p>Email: ${el.clientEmail}</p></center>
                 <p>Attendance: ${
-                  data.data.data[0].attendance
+                  el.attendance
                 }</p><p>Hall Name: ${
-          data.data.data[0].hallname
+          el.hallname
         }</p><p>Phone Number: ${
-          data.data.data[0].clientPhoneNumber
+          el.clientPhoneNumber
         }</p><p>session: ${
-          data.data.data[0].sessions[0] === "morning"
+          el.sessions[0] === "morning"
             ? "Morning"
-            : data.data.data[0].sessions[0] === "evening"
+            : el.sessions[0] === "evening"
             ? "Evening"
             : "Whole Day"
         }</p><p>from: ${new Date(
-          data.data.data[0].bookedFrom
+          el.bookedFrom
         ).toDateString()}</p><p>To: ${new Date(
-          data.data.data[0].bookedTo
+          el.bookedTo
         ).toDateString()}</p>`;
+        document.querySelector('.mod-group').insertAdjacentHTML('afterend', innerHTML)
+       })
       },
 
       hideAlert: function () {
@@ -1111,10 +1109,12 @@ if (calenderContEdit) {
 
       let newFilter = Array.from(
         document.querySelectorAll(".calender__days_edit div")
-      ).filter(
-        (div) =>
-          !calECtrl.returnFilterAndStartDate().dbBookedDays.includes(div.id)
-      );
+      )
+      
+      // .filter(
+      //   (div) =>
+      //     !calECtrl.returnFilterAndStartDate().dbBookedDays.includes(div.id)
+      // );
 
       console.log(newFilter);
       // modal.classList.remove('active')
@@ -1150,7 +1150,7 @@ if (calenderContEdit) {
                     calECtrl.convertWordToUtc(e.target.id)
                   )
                   .then((resp) => {
-                    modal.classList.toggle("active");
+                    modal.classList.remove("active");
 
                     // UIEctrl.showModal(resp);
                   });
@@ -1341,7 +1341,8 @@ if (calenderContEdit) {
         calECtrl
           .updateOneBook(booked, id)
           .then((res) => {
-            if (res.status === 201) {
+            console.log(res);
+            if (res?.data?.status === "success") {
               UIEctrl.showAlert(
                 "success",
                 "Update successful, redirecting...."
@@ -1350,19 +1351,17 @@ if (calenderContEdit) {
                 location.assign("/bookings");
               }, 1500);
             } else {
-              UIEctrl.showAlert("error", "Unauthorized...");
+              // UIEctrl.disableBtn();
+              Array.from(document.querySelectorAll(".active")).forEach(
+                (active) => {
+                  active.classList.remove("active");
+                }
+              );
+              renderAndAddEvent();
+              UIEctrl.showAlert("error", res.response.data.error);
             }
           })
-          .catch((e) => {
-            UIctrl.disableBtn();
-            Array.from(document.querySelectorAll(".active")).forEach(
-              (active) => {
-                active.classList.remove("active");
-              }
-            );
-            renderAndAddEvent();
-            UIEctrl.showAlert("error", res.response.data.error);
-          });
+          
       });
     });
 
@@ -1676,10 +1675,10 @@ if (calenderCont) {
               withCredentials: true,
             }
           );
-          console.log(res);
+          
           return res;
         } catch (error) {
-          console.log(error);
+        
           return error;
         }
       },
@@ -2054,12 +2053,14 @@ if (calenderCont) {
             method: "GET",
             url: `${window.location.protocol}//${window.location.host}/api/v1/bookingz/getavailability/hall/${hallname}/from/${val}`,
           });
+          
           return res;
         } catch (error) {
           // showAlert('error', error.response.data.message);
           console.log(error);
         }
       },
+
 
       getBookingDates: function () {
         return bookingDates;
@@ -2156,26 +2157,32 @@ if (calenderCont) {
       },
 
       showModal: function (data) {
-        modal.innerHTML = `<h2>${
-          data.data.data[0].clientName
-        }</h2><center><p>Email: ${data.data.data[0].clientEmail}</p></center>
-                <p>Attendance: ${
-                  data.data.data[0].attendance
-                }</p><p>Hall Name: ${
-          data.data.data[0].hallname
-        }</p><p>Phone Number: ${
-          data.data.data[0].clientPhoneNumber
-        }</p><p>session: ${
-          data.data.data[0].sessions[0] === "morning"
-            ? "Morning"
-            : data.data.data[0].sessions[0] === "evening"
-            ? "Evening"
-            : "Whole Day"
-        }</p><p>from: ${new Date(
-          data.data.data[0].bookedFrom
-        ).toDateString()}</p><p>To: ${new Date(
-          data.data.data[0].bookedTo
-        ).toDateString()}</p>`;
+
+        modal.innerHTML= `<div class="mod-group"><div>`
+        data.data.data.forEach(el => {
+          let innerHTML = `<div><h2>${
+            el.clientName
+          }</h2><center><p>Email: ${el.clientEmail}</p></center>
+                  <p>Attendance: ${
+                    el.attendance
+                  }</p><p>Hall Name: ${
+            el.hallname
+          }</p><p>Phone Number: ${
+            el.clientPhoneNumber
+          }</p><p>session: ${
+            el.sessions[0] === "morning"
+              ? "Morning"
+              : el.sessions[0] === "evening"
+              ? "Evening"
+              : "Whole Day"
+          }</p><p>from: ${new Date(
+            el.bookedFrom
+          ).toDateString()}</p><p>To: ${new Date(
+            el.bookedTo
+          ).toDateString()}</p></div>`;
+
+          document.querySelector('.mod-group').insertAdjacentHTML('afterend', innerHTML)
+        })
       },
 
       hideAlert: function () {
@@ -2477,9 +2484,11 @@ if (calenderCont) {
                     calCtrl.convertWordToUtc(e.target.id)
                   )
                   .then((resp) => {
+                    console.log(resp);
                     modal.classList.add("active");
 
                     UIctrl.showModal(resp);
+                    
                   });
               });
             }
@@ -2498,7 +2507,8 @@ if (calenderCont) {
                     calCtrl.convertWordToUtc(e.target.id)
                   )
                   .then((resp) => {
-                    modal.classList.toggle("active");
+                    
+                    modal.classList.remove("active");
 
                     // UIctrl.showModal(resp);
                   });
@@ -3011,24 +3021,30 @@ const UIPageController = (function () {
     },
 
     showModal: function (data) {
-      modal.innerHTML = `<h2>${
-        data.data.data[0].clientName
-      }</h2><center><p>Email: ${data.data.data[0].clientEmail}</p></center>
-            <p>Attendance: ${data.data.data[0].attendance}</p><p>Hall Name: ${
-        data.data.data[0].hallname
-      }</p><p>Phone Number: ${
-        data.data.data[0].clientPhoneNumber
-      }</p><p>session: ${
-        data.data.data[0].sessions[0] === "morning"
-          ? "Morning"
-          : data.data.data[0].sessions[0] === "evening"
-          ? "Evening"
-          : "Whole Day"
-      }</p><p>from: ${new Date(
-        data.data.data[0].bookedFrom
-      ).toDateString()}</p><p>To: ${new Date(
-        data.data.data[0].bookedTo
-      ).toDateString()}</p>`;
+      modal.innerHTML= `<div class="mod-group"><div>`
+      data.data.data.forEach(el => {
+        let innerHTML = `<h2>${
+          el.clientName
+        }</h2><center><p>Email: ${el.clientEmail}</p></center>
+              <p>Attendance: ${el.attendance}</p><p>Hall Name: ${
+          el.hallname
+        }</p><p>Phone Number: ${
+          el.clientPhoneNumber
+        }</p><p>session: ${
+          el.sessions[0] === "morning"
+            ? "Morning"
+            : el.sessions[0] === "evening"
+            ? "Evening"
+            : "Whole Day"
+        }</p><p>from: ${new Date(
+          el.bookedFrom
+        ).toDateString()}</p><p>To: ${new Date(
+          el.bookedTo
+        ).toDateString()}</p>`;
+
+        document.querySelector('.mod-group').insertAdjacentHTML('afterend', innerHTML)
+      })
+      
     },
 
     // set heafer month
@@ -3103,19 +3119,30 @@ var controller = (function (calCtrl, UIctrl) {
       )
       .then((res) => {
         calCtrl.setDbBooked(res);
-
-        calCtrl.getBookedForRender().forEach((data) => {
+      //  console.log(res);
+        const cache = {};
+        calCtrl.getBookedForRender().sort((a,b) => new Date(a.bookedFrom).getTime() - new Date(b.bookedFrom).getTime()).forEach((data, ind) => {
+          // console.log(data);
+          
           if (data.bookedFrom === data.bookedTo) {
             dayDate
               ? Array.from(dayDate?.childNodes).forEach((p) => {
+                
                   if (p.id === calCtrl.convertUtctoWord(data.bookedFrom)) {
-                    console.log("inside " + p.id);
-                    p.insertAdjacentHTML(
-                      "beforeend",
-                      `<p class="detail single" onmouseover="hoverDetail(this)" onmouseout="hoverDetailR(this)">${data.hallname}</p>`
-                    );
+                    
+                    if (!cache[p.id] || cache[p.id] !== data.hallname) {
+                        p.insertAdjacentHTML(
+                          "beforeend",
+                          `<p class="detail single" onmouseover="hoverDetail(this)" onmouseleave="hoverDetailR(this)">${data.hallname}</p>`
+                          );
+                          
+                          p.addEventListener('mouseover', hoverDetail)
+                      }
 
-                    // p.addEventListener('mouseover', hoverDetail)
+                      cache[p.id]= data.hallname;
+                      console.log(cache);
+                                        
+                    // console.log("inside " + p.id);
                   }
                 })
               : null;
@@ -3130,7 +3157,7 @@ var controller = (function (calCtrl, UIctrl) {
                       if (d?.id === calCtrl.convertUtctoWord(startDaySort)) {
                         d.insertAdjacentHTML(
                           "beforeend",
-                          `<p class="detail booked" onmouseover="hoverDetail(this)" onmouseout="hoverDetailR(this)">${data.hallname}</p>`
+                          `<p class="detail booked" onmouseover="hoverDetail(this)" onmouseleave="hoverDetailR(this)">${data.hallname}</p>`
                         );
 
                         // d.addEventListener('mouseover', hoverDetail)
@@ -3145,7 +3172,7 @@ var controller = (function (calCtrl, UIctrl) {
                       if (f.id === calCtrl.convertUtctoWord(startDaySort)) {
                         f.insertAdjacentHTML(
                           "beforeend",
-                          `<p class="detail middle-booked">${data.hallname}</p>`
+                          `<p style="margin-top: ${ind >= 1 ? 19: 0}px" class="detail middle-booked">${data.hallname}</p>`
                         );
                       }
                     })
@@ -3164,7 +3191,7 @@ var controller = (function (calCtrl, UIctrl) {
                   if (l.id === calCtrl.convertUtctoWord(data.bookedTo)) {
                     l.insertAdjacentHTML(
                       "beforeend",
-                      `<p class="detail end-booked">${data.hallname}</p>`
+                      `<p style="margin-top: ${ind * 19}px" class="detail end-booked">${data.hallname}</p>`
                     );
                   }
                 })
@@ -3174,24 +3201,24 @@ var controller = (function (calCtrl, UIctrl) {
       });
   };
 
-  navLeft &&
-    navLeft.addEventListener("click", () => {
-      calCtrl.clearDbBooked();
+  // navLeft &&
+  //   navLeft.addEventListener("click", () => {
+  //     calCtrl.clearDbBooked();
 
-      var date = calCtrl.returnDate();
+  //     var date = calCtrl.returnDate();
 
-      // reset date to prev month
-      calCtrl.decDate();
+  //     // reset date to prev month
+  //     calCtrl.decDate();
 
-      let month = calCtrl.convertDateToMonth();
+  //     let month = calCtrl.convertDateToMonth();
 
-      UIctrl.updateHeadOnArrPress(month);
+  //     UIctrl.updateHeadOnArrPress(month);
 
-      // update UI with month
-      UIctrl.groupheadDate(date);
+  //     // update UI with month
+  //     UIctrl.groupheadDate(date);
 
-      renderDaysOfCal(date);
-    });
+  //     renderDaysOfCal(date);
+  //   });
 
   navRight &&
     navRight.addEventListener("click", () => {
@@ -3239,19 +3266,8 @@ const hoverDetail = (e) => {
     });
 };
 
-const hoverDetailR = (e) => {
-  const id = e.parentElement.id;
-  const place = e.textContent;
-
-  calenderPageController
-    .getbookedDataOnHover(place, calenderPageController.convertWordToUtc(id))
-    .then((res) => {
-      // console.log(res);
-
-      modal.classList.toggle("active");
-
-      // UIPageController.showModal(res);
-    });
+function hoverDetailR(e) {
+  modal.classList.remove("active");
 };
 
 // View bookings-table
@@ -3927,4 +3943,14 @@ const croneJob = async () => {
   );
 };
 
-croneJob();
+const deleteBin = async () => {
+
+  const response = await fetch(`${location.protocol}//${location.host}/api/v1/bookings/bin/delete`,{
+    method: 'DELETE',
+  })
+
+  const res = await response.json()
+  console.log(res);
+};
+deleteBin()
+// croneJob();

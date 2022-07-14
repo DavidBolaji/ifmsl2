@@ -8638,6 +8638,13 @@ var showAlert = function showAlert(type, message, delayed) {
 }; // DOM QUERIES
 
 
+var monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+console.log(monthArr.indexOf("Jan"));
+var Calendar = tui.Calendar;
+var calenderMntGrpH1 = document.querySelector(".calender-month h2");
+var calenderMntGrpP = document.querySelector(".calender-month p");
+var navLeft = document.querySelector(".nav-left i");
+var navRight = document.querySelector(".nav-right i");
 var menubtn = document.querySelector(".menu-btn");
 var loginForm = document.querySelector("#login-form");
 var registerForm = document.querySelector("#register-form");
@@ -8653,7 +8660,59 @@ var availabilityForm = document.querySelector("#availability-form");
 var downloadBtn = document.querySelector("#export");
 var deleteBtn = document.querySelector("#deleteOne"); // const updateBtn = document.querySelector('#updateOne');
 // DOM MANIPULATION
-// MENU MARKUP
+
+var date = new Date();
+var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(); // MENU MARKUP
+
+if (navLeft && navRight) {
+  navLeft.addEventListener("click", function () {
+    var reducedDate = decDate(date);
+    var month = convertDateToMonth();
+    updateHeadOnArrPress(month);
+    groupheadDate(date);
+    calendar.setDate(date);
+    getAllBookings(getFirstAndLastDay().from, getFirstAndLastDay().to).then(function (res) {
+      calendar.clear(); // const finalData = updateTime(res)
+      // console.log(finalData);
+
+      var bookedResult = changeKey(res.data.data);
+      calendar.createEvents(bookedResult);
+    });
+  });
+  navRight.addEventListener("click", function () {
+    // reset date to prev month
+    var increaseDate = incDate(date);
+    var month = convertDateToMonth();
+    updateHeadOnArrPress(month); // update UI with month
+
+    groupheadDate(date);
+    calendar.setDate(date);
+    getAllBookings(getFirstAndLastDay().from, getFirstAndLastDay().to).then(function (res) {
+      calendar.clear(); // const finalData = updateTime(res)
+      // console.log(finalData);
+
+      var bookedResult = changeKey(res.data.data);
+      calendar.createEvents(bookedResult);
+    });
+  });
+  window.addEventListener('load', function () {
+    getAllBookings(getFirstAndLastDay().from, getFirstAndLastDay().to).then(function (res) {
+      calendar.clear(); // const finalData = updateTime(res)
+      // console.log(finalData);
+
+      var bookedResult = changeKey(res.data.data);
+      calendar.createEvents(bookedResult);
+    });
+  });
+  var calendar = new Calendar('#calendar', {
+    defaultView: 'month'
+  });
+  calendar.setOptions({
+    useDetailPopup: true
+  }); // calendar.setDate('2022-03-01');
+  // Passing the Date object directly
+  // calendar.setDate(new Date(2022, 4, 1))  
+}
 
 if (menubtn) {
   menubtn.addEventListener("click", function () {
@@ -8672,7 +8731,7 @@ if (deleteBtn) {
   var id = window.location.href.split(/\//)[4];
   deleteBtn.addEventListener("click", function (ev) {
     ev.preventDefault();
-    deleteOneBook(id);
+    deleteOneBook(id, localStorage.getItem("user_delete_id"));
   });
 }
 
@@ -9034,15 +9093,15 @@ function createOneBook(_x9) {
 function _createOneBook() {
   _createOneBook = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee9(options) {
+  regeneratorRuntime.mark(function _callee10(options) {
     var res;
-    return regeneratorRuntime.wrap(function _callee9$(_context9) {
+    return regeneratorRuntime.wrap(function _callee10$(_context10) {
       while (1) {
-        switch (_context9.prev = _context9.next) {
+        switch (_context10.prev = _context10.next) {
           case 0:
-            _context9.prev = 0;
+            _context10.prev = 0;
             showAlert("success", "Reservation processing, please wait.... ", true);
-            _context9.next = 4;
+            _context10.next = 4;
             return (0, _axios.default)({
               method: "POST",
               url: "".concat(location.protocol, "//").concat(location.host, "/api/v1/bookings"),
@@ -9052,7 +9111,7 @@ function _createOneBook() {
             });
 
           case 4:
-            res = _context9.sent;
+            res = _context10.sent;
             console.log(res);
 
             if (res.status === 201) {
@@ -9062,26 +9121,25 @@ function _createOneBook() {
               }, 1500);
             }
 
-            _context9.next = 13;
+            _context10.next = 12;
             break;
 
           case 9:
-            _context9.prev = 9;
-            _context9.t0 = _context9["catch"](0);
-            console.log(_context9.t0);
+            _context10.prev = 9;
+            _context10.t0 = _context10["catch"](0);
 
-            if (_context9.t0.response.status === 11000) {
-              showAlert("error", _context9.t0.response.data.error);
+            if (_context10.t0.response.status === 11000) {
+              showAlert("error", _context10.t0.response.data.error);
             } else {
-              showAlert("error", _context9.t0.response.data.error);
+              showAlert("error", _context10.t0.response.data.error);
             }
 
-          case 13:
+          case 12:
           case "end":
-            return _context9.stop();
+            return _context10.stop();
         }
       }
-    }, _callee9, null, [[0, 9]]);
+    }, _callee10, null, [[0, 9]]);
   }));
   return _createOneBook.apply(this, arguments);
 }
@@ -9199,7 +9257,7 @@ var deleteOneBook =
 function () {
   var _ref7 = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee7(id) {
+  regeneratorRuntime.mark(function _callee7(id, user) {
     var res;
     return regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
@@ -9209,7 +9267,7 @@ function () {
             _context7.next = 3;
             return (0, _axios.default)({
               method: "DELETE",
-              url: "".concat(location.protocol, "//").concat(location.host, "/api/v1/bookings/").concat(id)
+              url: "".concat(location.protocol, "//").concat(location.host, "/api/v1/bookings/").concat(id, "/").concat(user)
             }, {
               withCredentials: true
             });
@@ -9240,17 +9298,68 @@ function () {
     }, _callee7, null, [[0, 7]]);
   }));
 
-  return function deleteOneBook(_x13) {
+  return function deleteOneBook(_x13, _x14) {
     return _ref7.apply(this, arguments);
   };
 }();
 
-var updateOneBook =
+var today = function today() {
+  var currentDate = new Date();
+  var cDay = currentDate.getDate();
+  var cMonth = currentDate.getMonth() + 1;
+  var cYear = currentDate.getFullYear();
+  return cDay + "/" + cMonth + "/" + cYear;
+};
+
+var decDate = function decDate(date) {
+  return date.setMonth(date.getMonth() - 1);
+};
+
+var incDate = function incDate(date) {
+  return date.setMonth(date.getMonth() + 1);
+};
+
+var convertDateToMonth = function convertDateToMonth() {
+  return date.toDateString().split(" ")[1];
+};
+
+var updateHeadOnArrPress = function updateHeadOnArrPress(monthData) {
+  calenderMntGrpH1.innerHTML = monthData;
+};
+
+var groupheadDate = function groupheadDate(dateGroup) {
+  calenderMntGrpP.innerHTML = dateGroup?.toDateString();
+};
+
+var changeKey = function changeKey(arrs) {
+  var bookedArr = arrs.map(function (arr) {
+    console.log(arrs, new Date(arr.bookedFrom));
+    return {
+      id: arr._id,
+      calendarId: arr._id,
+      title: arr.hallname,
+      start: new Date(arr.bookedFrom).toLocaleString(),
+      end: new Date(arr.bookedTo).toLocaleString(),
+      body: "<h2>Name: ".concat(arr.clientName, "</h2> \n <p>Email: ").concat(arr.clientEmail, "</p> \n\n                <p>Attendance: ").concat(arr.attendance, "</p> \n <p>Phone Number: ").concat(arr.clientPhoneNumber, "</p> \n <p>session: ").concat(arr.sessions[0] === "morning" ? "Morning" : arr.sessions[0] === "evening" ? "Evening" : "Whole Day", "</p><p>from: ").concat(new Date(arr.bookedFrom).toDateString(), "</p><p>To: ").concat(new Date(arr.bookedTo).toDateString(), "</p>"),
+      state: 'Booked',
+      // isReadOnly: true,
+      color: '#fff',
+      backgroundColor: '#916d35',
+      customStyle: {
+        fontStyle: 'italic',
+        fontSize: '15px'
+      }
+    };
+  });
+  return bookedArr;
+};
+
+var getAllBookings =
 /*#__PURE__*/
 function () {
   var _ref8 = _asyncToGenerator(
   /*#__PURE__*/
-  regeneratorRuntime.mark(function _callee8(id, options) {
+  regeneratorRuntime.mark(function _callee8(from, to) {
     var res;
     return regeneratorRuntime.wrap(function _callee8$(_context8) {
       while (1) {
@@ -9259,30 +9368,18 @@ function () {
             _context8.prev = 0;
             _context8.next = 3;
             return (0, _axios.default)({
-              method: "PATCH",
-              url: "".concat(location.protocol, "//").concat(location.host, "/api/v1/bookings/").concat(id),
-              data: _objectSpread({}, options)
-            }, {
-              withCredentials: true
+              method: "GET",
+              url: "".concat(window.location.protocol, "//").concat(window.location.host, "/api/v1/bookings/getall/from/").concat(from, "/to/").concat(to)
             });
 
           case 3:
             res = _context8.sent;
-
-            if (res.status === 201) {
-              showAlert("success", "Update successful, redirecting....");
-              window.setTimeout(function () {
-                location.assign("/bookings");
-              }, 1000);
-            }
-
-            _context8.next = 10;
-            break;
+            return _context8.abrupt("return", res);
 
           case 7:
             _context8.prev = 7;
             _context8.t0 = _context8["catch"](0);
-            showAlert("error", _context8.t0.response.data.error);
+            console.log(_context8.t0);
 
           case 10:
           case "end":
@@ -9292,8 +9389,74 @@ function () {
     }, _callee8, null, [[0, 7]]);
   }));
 
-  return function updateOneBook(_x14, _x15) {
+  return function getAllBookings(_x15, _x16) {
     return _ref8.apply(this, arguments);
+  };
+}();
+
+var getFirstAndLastDay = function getFirstAndLastDay() {
+  if (date.getMonth() < 10) {
+    return {
+      from: "".concat(date.getFullYear(), "-0").concat(date.getMonth() + 1, "-01T00:00:00.000Z"),
+      to: "".concat(date.getFullYear(), "-0").concat(date.getMonth() + 1, "-").concat(lastDay, "T00:00:00.000Z")
+    };
+  } else {
+    return {
+      from: "".concat(date.getFullYear(), "-").concat(date.getMonth() + 1, "-01T00:00:00.000Z"),
+      to: "".concat(date.getFullYear(), "-").concat(date.getMonth() + 1, "-").concat(lastDay, "T00:00:00.000Z")
+    };
+  }
+};
+
+var updateOneBook =
+/*#__PURE__*/
+function () {
+  var _ref9 = _asyncToGenerator(
+  /*#__PURE__*/
+  regeneratorRuntime.mark(function _callee9(id, options) {
+    var res;
+    return regeneratorRuntime.wrap(function _callee9$(_context9) {
+      while (1) {
+        switch (_context9.prev = _context9.next) {
+          case 0:
+            _context9.prev = 0;
+            _context9.next = 3;
+            return (0, _axios.default)({
+              method: "PATCH",
+              url: "".concat(location.protocol, "//").concat(location.host, "/api/v1/bookings/").concat(id),
+              data: _objectSpread({}, options)
+            }, {
+              withCredentials: true
+            });
+
+          case 3:
+            res = _context9.sent;
+
+            if (res.status === 201) {
+              showAlert("success", "Update successful, redirecting....");
+              window.setTimeout(function () {
+                location.assign("/bookings");
+              }, 1000);
+            }
+
+            _context9.next = 10;
+            break;
+
+          case 7:
+            _context9.prev = 7;
+            _context9.t0 = _context9["catch"](0);
+            showAlert("error", _context9.t0.response.data.error);
+
+          case 10:
+          case "end":
+            return _context9.stop();
+        }
+      }
+    }, _callee9, null, [[0, 7]]);
+  }));
+
+  return function updateOneBook(_x17, _x18) {
+    return _ref9.apply(this, arguments);
   };
 }();
 

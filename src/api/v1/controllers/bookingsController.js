@@ -77,14 +77,18 @@ exports.getAllBookings = async (req, res, next) => {
     ) {
       return count;
     });
-    const features = new APIFeatures(Booking.find(), req.query)
+    
+    let features = new APIFeatures(Booking.find(), req.query)
       .filter()
-      .sort()
-      .select()
+      // .sort()
+      // .select()
       .pagination();
 
-    const bookings = await features.query;
-    // SEND RESPONSE
+      let bookings = await features.query.sort({bookedFrom: 1});
+      
+      // SEND RESPONSE
+
+      // console.log(bookings);
     return responseHandler(res, 200, {
       count: JSON.stringify(count),
       bookings,
@@ -151,15 +155,41 @@ exports.createBooking = async (req, res, next) => {
 exports.multipleBooking = async (req, res, next) => {
   const arr = ["morning", "evening"];
   const f = await Booking.find({
-    bookedFrom: req.body[0].bookedFrom,
+    bookedFrom: {$lte:req.body[0].bookedFrom },
     hallname: req.body[0].hallname,
   });
 
-  console.log(f);
+  for(let idx = 0;idx < f.length; idx++){
+    console.log(new Date(req.body[0].bookedFrom).getTime() == new Date(f[idx].bookedTo).getTime());
+    if(new Date(req.body[0].bookedFrom).getTime() === new Date(f[idx].bookedTo).getTime()) {
+      if(f[idx]?.sessions?.length === 0) {
+        return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
+      } else {
+        if (f[idx].sessions[0] === req.body[0].sessions[0]) {
+          return `${
+            el.sessions[0] === "morning"
+              ? next(new CustomError(400, "Morning is already booked"))
+              : next(new CustomError(400, "Evening is already booked"))
+          } `;
+        }
+      }
+
+    } else if(new Date(req.body[0].bookedFrom).getTime() === new Date(f[idx].bookedFrom).getTime()) {
+      if(new Date(f[idx].bookedFrom).getTime() === new Date(f[idx].bookedTo).getTime()) {
+        break; 
+      } else {
+        
+        return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
+      }
+    } else if(new Date(f[idx].bookedFrom).getTime() <= new Date(req.body[0].bookedFrom).getTime() && new Date(f[idx].bookedTo).getTime() >= new Date(req.body[0].bookedFrom).getTime()) {
+        console.log('in-range');
+        return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
+    }
+  
+  }
+
 
   const newF = f.map((r) => r.sessions[0]);
-
-  console.log(newF);
 
   if (newF.length !== 0 && typeof newF[0] === "undefined") {
     return next(new CustomError(400, "Day is fully booked"));
@@ -235,11 +265,50 @@ exports.getSingleBooking = async (req, res, next) => {
 };
 
 exports.updateBooking = async (req, res, next) => {
+  const arr = ["morning", "evening"];
+  const f = await Booking.find({
+    bookedFrom: req.body[0].bookedFrom,
+    hallname: req.body[0].hallname,
+    '_id': {$ne: req.params.id}
+  });
+
+  console.log(f);
+
+  
+
+  const newF = f.map((r) => r.sessions[0]);
+
+  if (newF.length !== 0 && typeof newF[0] === "undefined") {
+    return next(new CustomError(400, "Day is fully booked"));
+  }
+
+  const valid = arr.every((el) => newF.includes(el));
+
+  if (newF.length !== 0 && valid) {
+    return next(new CustomError(400, "Day is fully booked"));
+  }
+
+  if (f.length > 0) {
+    if (f[0].sessions[0] === req.body[0].sessions[0]) {
+      return `${
+        f[0].sessions[0] === "morning"
+          ? next(new CustomError(400, "Morning is already booked"))
+          : next(new CustomError(400, "Evening is already booked"))
+      } `;
+    } else {
+      if (req.body[0].sessions.length === 0)
+        return `${
+          f[0].sessions[0] === "morning"
+            ? next(new CustomError(400, "You can only book Evening"))
+            : next(new CustomError(400, "You can only book Morning"))
+        } `;
+    }
+  }
+
+
   try {
     const { id, user } = req.params;
     const booking = await Booking.findById(id);
-
-    console.log(booking.user, user);
 
     if (booking.user != user) {
       return next(new CustomError(401, "Unauthorized"));
@@ -288,7 +357,6 @@ exports.deleteSingleBooking = async (req, res, next) => {
     const bookBin = await Booking.find({ _id: id });
 
     if (user != bookBin[0].user) {
-      console.log("notpassed");
       return next(new CustomError(401, "Unauthorized"));
     }
     console.log(bookBin);
@@ -512,13 +580,13 @@ exports.getUnfilteredBookings = async (req, res, next) => {
     });
     let booking;
     if (search === "clientName") {
-      booking = await Booking.find({ clientName: { $regex: value } });
+      booking = await Booking.find({ clientName: { $regex: value } }).sort({ bookedFrom: -1});
     } else if (search === "clientEmail") {
-      booking = await Booking.find({ clientEmail: { $regex: value } });
+      booking = await Booking.find({ clientEmail: { $regex: value } }).sort({ bookedFrom: -1});
     } else if (search === "hallname") {
-      booking = await Booking.find({ hallname: { $regex: value } });
+      booking = await Booking.find({ hallname: { $regex: value } }).sort({ bookedFrom: -1});
     } else if (search === "bookedFrom") {
-      booking = await Booking.find({ bookedFrom: { $gte: new Date(value) } });
+      booking = await Booking.find({ bookedFrom: { $gte: new Date(value) } }).sort({ bookedFrom: -1});
     }
 
     responseHandler(res, 200, {
@@ -593,5 +661,20 @@ exports.croneDelete = async (req, res, next) => {
 
   responseHandler(res, 200, hall);
 };
+
+exports.deleteBin = async (req, res, next) => {
+  const { day } = req.params;
+
+  const hall = await Booking.deleteMany({ bin: true });
+
+  console.log(hall);
+
+  if (!hall) {
+    console.log('error');
+  }
+
+  responseHandler(res, 200, hall);
+};
+
 
 client.connect();

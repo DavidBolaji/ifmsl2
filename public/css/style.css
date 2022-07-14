@@ -548,8 +548,8 @@ ul {
 .calender-body-body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  height: 100vh;
-  grid-template-rows: repeat(5, 1fr);
+  min-height: 50vh;
+  /* grid-template-rows: repeat(5, 1fr); */
 
   /* padding: 10px; */
 }
@@ -570,6 +570,15 @@ ul {
 
 .current-day {
   background-color: #ededed;
+}
+
+.toastui-calendar-weekday .toastui-calendar-grid-selection {
+    background-color: transparent !important;
+    border: none !important;
+}
+
+.toastui-calendar-detail-container .toastui-calendar-section-button {
+  display: none !important;
 }
 
 .detail {
@@ -642,7 +651,7 @@ span.date-date {
 
 .modal {
   width: 200px;
-  height: 300px;
+  height: auto;
   position: fixed;
   background-color: rgba(255, 255, 255, 0.589);
   margin: auto;
@@ -654,6 +663,7 @@ span.date-date {
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 20px;
+  padding-bottom: 20px;
   visibility: hidden;
   transition: transform 0.3s ease-in;
   display: flex;
@@ -861,6 +871,7 @@ span.date-date {
 .input-session,
 .inputE-session {
   margin-top: 5px;
+  margin-bottom: 15px;
   display: flex;
   align-items: center;
 }

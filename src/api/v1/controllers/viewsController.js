@@ -21,10 +21,11 @@ exports.getBookings = async (req, res, next) => {
 		// GET ALL BOOKINGS DATA FROM COLLECTION
 		const features = new APIFeatures(Booking.find(), req.query)
 			.filter()
-			.sort()
-			.select()
+			// .sort()
+			// .select()
 			.pagination();
-		const bookings = await features.query;
+		const bookings = await features.query.sort({bookedFrom: 1});
+		
 		// BUILD TEMPLATE
 		// RENDER TEMPLATE
 		res.status(200).render('bookings', {
@@ -43,11 +44,11 @@ exports.getBookingsTable = async (req, res, next) => {
 	try {
 		// GET ALL BOOKINGS DATA FROM COLLECTION
 		const features = new APIFeatures(Booking.find(), {
-			sort: 'bookedFrom',
-		}).sort();
-		const bookings = await features.query;
+			
+		});
+		const bookings = await features.query.sort({bookedFrom: 1});
 		// BUILD TEMPLATE
-
+		
 		// RENDER TEMPLATE
 		res.status(200).render('bookingsTable', {
 			title: 'Bookings Table',

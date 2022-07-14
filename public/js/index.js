@@ -14,6 +14,29 @@ const showAlert = (type, message, delayed) => {
 };
 
 // DOM QUERIES
+
+let monthArr = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+console.log(monthArr.indexOf("Jan"));
+
+const Calendar = tui.Calendar;
+const calenderMntGrpH1 = document.querySelector(".calender-month h2");
+const calenderMntGrpP = document.querySelector(".calender-month p");
+const navLeft = document.querySelector(".nav-left i");
+const navRight = document.querySelector(".nav-right i");
 const menubtn = document.querySelector(".menu-btn");
 const loginForm = document.querySelector("#login-form");
 const registerForm = document.querySelector("#register-form");
@@ -30,8 +53,92 @@ const downloadBtn = document.querySelector("#export");
 const deleteBtn = document.querySelector("#deleteOne");
 // const updateBtn = document.querySelector('#updateOne');
 // DOM MANIPULATION
-
+let date = new Date();
+let lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 // MENU MARKUP
+if(navLeft && navRight) {
+  navLeft.addEventListener("click", () => {
+
+    let reducedDate = decDate(date)
+
+    let month = convertDateToMonth();
+
+    updateHeadOnArrPress(month)
+
+    groupheadDate(date)
+
+    calendar.setDate(date);
+
+    getAllBookings(
+      getFirstAndLastDay().from,
+      getFirstAndLastDay().to,
+    ).then(res => {
+      
+      calendar.clear()
+      // const finalData = updateTime(res)
+      // console.log(finalData);
+      const bookedResult = changeKey(res.data.data);
+     
+
+      calendar.createEvents(bookedResult);
+    })
+  });
+
+
+  navRight.addEventListener("click", () => {
+    // reset date to prev month
+    let increaseDate = incDate(date)
+
+    let month = convertDateToMonth();
+
+    updateHeadOnArrPress(month);
+    // update UI with month
+    groupheadDate(date);
+
+    calendar.setDate(date);
+
+    getAllBookings(
+      getFirstAndLastDay().from,
+      getFirstAndLastDay().to,
+    ).then(res => {
+      calendar.clear()
+      // const finalData = updateTime(res)
+      // console.log(finalData);
+      const bookedResult = changeKey(res.data.data);
+
+      calendar.createEvents(bookedResult);
+    })
+  });
+
+  window.addEventListener('load', () => {
+    getAllBookings(
+      getFirstAndLastDay().from,
+      getFirstAndLastDay().to,
+    ).then(res => {
+      calendar.clear()
+      // const finalData = updateTime(res)
+      // console.log(finalData);
+      const bookedResult = changeKey(res.data.data);
+
+      calendar.createEvents(bookedResult);
+    })
+  })
+
+  const calendar = new Calendar('#calendar', {
+    defaultView: 'month',
+  });
+
+
+  
+  calendar.setOptions({
+    useDetailPopup: true,
+  });
+  
+  // calendar.setDate('2022-03-01');
+  
+  // Passing the Date object directly
+  // calendar.setDate(new Date(2022, 4, 1))  
+}
 
 if (menubtn) {
   menubtn.addEventListener("click", () => {
@@ -48,7 +155,7 @@ if (deleteBtn) {
   const id = window.location.href.split(/\//)[4];
   deleteBtn.addEventListener("click", (ev) => {
     ev.preventDefault();
-    deleteOneBook(id);
+    deleteOneBook(id, localStorage.getItem("user_delete_id"));
   });
 }
 
@@ -97,6 +204,9 @@ if (rangeBtn) {
     showRange();
   });
 }
+
+
+
 
 if (searchBar) {
   searchBar.addEventListener("submit", (e) => {
@@ -285,7 +395,7 @@ async function createOneBook(options) {
       }, 1500);
     }
   } catch (error) {
-    console.log(error);
+    
     if (error.response.status === 11000) {
       showAlert("error", error.response.data.error);
     } else {
@@ -342,12 +452,12 @@ const downloadCSV = async () => {
   }
 };
 
-const deleteOneBook = async (id) => {
+const deleteOneBook = async (id, user) => {
   try {
     const res = await axios(
       {
         method: "DELETE",
-        url: `${location.protocol}//${location.host}/api/v1/bookings/${id}`,
+        url: `${location.protocol}//${location.host}/api/v1/bookings/${id}/${user}`,
       },
       {
         withCredentials: true,
@@ -363,6 +473,112 @@ const deleteOneBook = async (id) => {
     showAlert("error", error.response.data.error);
   }
 };
+
+const today = () => {
+  let currentDate = new Date();
+  let cDay = currentDate.getDate();
+  let cMonth = currentDate.getMonth() + 1;
+  let cYear = currentDate.getFullYear();
+  return cDay + "/" + cMonth + "/" + cYear ;
+}
+
+const decDate = (date) => {
+  return date.setMonth(date.getMonth() - 1);
+}
+
+const incDate = (date) => {
+  return date.setMonth(date.getMonth() + 1);
+}
+
+const convertDateToMonth = () => {
+  return date.toDateString().split(" ")[1];
+}
+
+const updateHeadOnArrPress =  (monthData)  => {
+  calenderMntGrpH1.innerHTML = monthData ;
+}
+
+const groupheadDate = (dateGroup) => {
+  calenderMntGrpP.innerHTML = dateGroup?.toDateString();
+}
+
+
+const changeKey = (arrs) => {
+  
+  const bookedArr = arrs.map(arr => {
+    console.log(arrs, new Date(arr.bookedFrom));
+    return {
+        id: arr._id,
+        calendarId: arr._id,
+        title: arr.hallname,
+        start:  new Date(arr.bookedFrom).toLocaleString(),
+        end: new Date(arr.bookedTo).toLocaleString(),
+        body: `<h2>Name: ${
+          arr.clientName
+        }</h2> \n <p>Email: ${arr.clientEmail}</p> \n
+                <p>Attendance: ${
+                  arr.attendance
+                }</p> \n <p>Phone Number: ${
+          arr.clientPhoneNumber
+        }</p> \n <p>session: ${
+          arr.sessions[0] === "morning"
+            ? "Morning"
+            : arr.sessions[0] === "evening"
+            ? "Evening"
+            : "Whole Day"
+        }</p><p>from: ${new Date(
+          arr.bookedFrom
+        ).toDateString()}</p><p>To: ${new Date(
+          arr.bookedTo
+        ).toDateString()}</p>`,
+        state: 'Booked',
+        // isReadOnly: true,
+        color: '#fff',
+        backgroundColor: '#916d35',
+        customStyle: {
+          fontStyle: 'italic',
+          fontSize: '15px',
+        },
+    }
+  })
+
+  return bookedArr;
+}
+
+const getAllBookings =  async (from, to) => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `${window.location.protocol}//${window.location.host}/api/v1/bookings/getall/from/${from}/to/${to}`,
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const getFirstAndLastDay = () => {
+  if (date.getMonth() < 10) {
+    return {
+      from: `${date.getFullYear()}-0${
+        date.getMonth() + 1
+      }-01T00:00:00.000Z`,
+      to: `${date.getFullYear()}-0${
+        date.getMonth() + 1
+      }-${lastDay}T00:00:00.000Z`,
+    };
+  } else {
+    return {
+      from: `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-01T00:00:00.000Z`,
+      to: `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${lastDay}T00:00:00.000Z`,
+    };
+  }
+}
+
 const updateOneBook = async (id, options) => {
   try {
     const res = await axios(
