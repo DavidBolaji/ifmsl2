@@ -1,0 +1,21 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/ifmswokc/book"
+PassengerBaseURI "/"
+PassengerNodejs "/home/ifmswokc/nodevenv/book/14/bin/node"
+PassengerAppType node
+PassengerStartupFile www.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+SetEnv BOOKRES_MAIL support@bookingreservation.com.ng
+SetEnv BOOKRES_MAIL_PASS staff@support
+SetEnv JWT_EXPIRES_IN 30
+SetEnv JWT_SECRET this-is-my-very-ultra-secret-password:123456789-lol
+SetEnv MONGO_URI mongodb+srv://bookapp:bookapp1234@cluster0.z3wtq.mongodb.net/bookapp
+SetEnv MT_PASS 34ad3aef14a8e7
+SetEnv MT_USER 9fda9422afd6b6
+SetEnv NODE_ENV production
+SetEnv SENDGRID_API_KEY SG.Uhe-fh-YQm67sYVcuJNctQ.9987pXsNpO2M-VTBWAhKG-ax1WtGXuKnoK-2BZGqE
+SetEnv XPIRATION 30d
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

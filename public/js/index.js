@@ -30,9 +30,10 @@ let monthArr = [
   "Dec",
 ];
 
-console.log(monthArr.indexOf("Jan"));
 
-const Calendar = tui?.Calendar;
+const Calendar = require('@toast-ui/calendar');
+require('@toast-ui/calendar/dist/toastui-calendar.min.css');
+// let Calendar = tui?.Calendar;
 const calenderMntGrpH1 = document.querySelector(".calender-month h2");
 const calenderMntGrpP = document.querySelector(".calender-month p");
 const navLeft = document.querySelector(".nav-left i");
