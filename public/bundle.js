@@ -34646,6 +34646,10 @@ require("regenerator-runtime/runtime");
 
 var _axios = _interopRequireDefault(require("axios"));
 
+var _calendar = _interopRequireDefault(require("@toast-ui/calendar"));
+
+require("@toast-ui/calendar/dist/toastui-calendar.min.css");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -34672,12 +34676,7 @@ var showAlert = function showAlert(type, message, delayed) {
 }; // DOM QUERIES
 
 
-var monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-var Calendar = require('@toast-ui/calendar');
-
-require('@toast-ui/calendar/dist/toastui-calendar.min.css'); // let Calendar = tui?.Calendar;
-
+var monthArr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; // var Calendar = tui?.Calendar;
 
 var calenderMntGrpH1 = document.querySelector(".calender-month h2");
 var calenderMntGrpP = document.querySelector(".calender-month p");
@@ -34742,7 +34741,7 @@ if (navLeft && navRight) {
       calendar.createEvents(bookedResult);
     });
   });
-  var calendar = new Calendar('#calendar', {
+  var calendar = new _calendar.default('#calendar', {
     defaultView: 'month'
   });
   calendar.setOptions({

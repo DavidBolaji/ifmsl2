@@ -1,10 +1,12 @@
 import "@babel/polyfill";
 import axios from "axios";
+import Calendar from '@toast-ui/calendar';
+import '@toast-ui/calendar/dist/toastui-calendar.min.css';
 
 const hideAlert = () => {
   const el = document.querySelector(".alert");
   if (el) el.parentElement.removeChild(el);
-};
+}; 
 const showAlert = (type, message, delayed) => {
   hideAlert();
   const markup = `<div class="alert alert__${type}">${message}</div>`;
@@ -31,9 +33,8 @@ let monthArr = [
 ];
 
 
-const Calendar = require('@toast-ui/calendar');
-require('@toast-ui/calendar/dist/toastui-calendar.min.css');
-// let Calendar = tui?.Calendar;
+
+// var Calendar = tui?.Calendar;
 const calenderMntGrpH1 = document.querySelector(".calender-month h2");
 const calenderMntGrpP = document.querySelector(".calender-month p");
 const navLeft = document.querySelector(".nav-left i");
@@ -125,7 +126,7 @@ if(navLeft && navRight) {
     })
   })
 
-  const calendar = new Calendar('#calendar', {
+  var calendar = new Calendar('#calendar', {
     defaultView: 'month',
   });
 
