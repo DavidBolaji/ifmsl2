@@ -265,6 +265,7 @@ if (calenderContEdit) {
 
         return newName;
       },
+      
       calcPayment: function (data) {
         return {
           discount: 0,
@@ -302,7 +303,7 @@ if (calenderContEdit) {
           return div.id;
         });
 
-        console.log(multiple);
+        
 
         multiple = multiple.filter((d) => {
           return d?.hallname !== hall;
@@ -598,16 +599,25 @@ if (calenderContEdit) {
       },
 
       convertWordToUtc: function (str) {
+        const monthShort =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         let val = new Date(str).toDateString().split(" ")[2];
+        let valOne = new Date(str).toDateString().split(" ")[1];
+        valOne = monthShort.indexOf(valOne)
+        
         let date = new Date(str);
-        val < 10
-          ? (date = `${date.getFullYear()}-0${
+        if((valOne + 1) < 10) {
+         
+          date = `${date.getFullYear()}-0${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`)
-          : (date = `${date.getFullYear()}-0${
+            }-${val}T00:00:00.000Z`
+
+        } else {
+          
+          date = `${date.getFullYear()}-${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`);
-        return date;
+            }-${val}T00:00:00.000Z`
+        }
+        return date
       },
 
       convertUtctoWord: function (str) {
@@ -1116,7 +1126,7 @@ if (calenderContEdit) {
       //     !calECtrl.returnFilterAndStartDate().dbBookedDays.includes(div.id)
       // );
 
-      console.log(newFilter);
+      
       // modal.classList.remove('active')
       Array.from(document.querySelectorAll(".calender__days_edit div")).forEach(
         (div) => {
@@ -1185,7 +1195,7 @@ if (calenderContEdit) {
           calECtrl.clearBooked(
             Array.from(document.querySelectorAll(".calender__days_edit div"))
           );
-          console.log(result.data.data[0]);
+          
           calECtrl.uploadBooked(result);
 
           calECtrl.convertBookedArr();
@@ -1235,7 +1245,7 @@ if (calenderContEdit) {
 
       let bookedDate = calECtrl.getBookingDates();
 
-      console.log(bookedDate);
+      
       // get the set date
       var date = calECtrl.returnDate();
 
@@ -1310,9 +1320,9 @@ if (calenderContEdit) {
       let bookedData = UIEctrl.getBookedValueE();
 
       for (const val in bookedData) {
-        console.log(val);
+        
         if (val === "clientName" && bookedData[val] === "") {
-          console.log("entered");
+          
           return UIctrl.showAlert("error", "Client Name cannot be empty");
         } else if (val === "clientTel" && bookedData[val] === "") {
           return UIctrl.showAlert("error", "Client Number cannot be empty");
@@ -1332,16 +1342,16 @@ if (calenderContEdit) {
       }
       // store the booked values
       calECtrl.getbookedData(bookedData, (booked) => {
-        console.log(booked);
+       
 
         let baseUrl = window.location.href.split("/");
         let id = baseUrl[baseUrl.length - 1];
 
-        console.log(booked);
+       
         calECtrl
           .updateOneBook(booked, id)
           .then((res) => {
-            console.log(res);
+            
             if (res?.data?.status === "success") {
               UIEctrl.showAlert(
                 "success",
@@ -1548,9 +1558,7 @@ if (calenderCont) {
 
     return {
       updatePayment: function (data, daysdiff, disc = "") {
-        console.log(disc);
-        console.log(data);
-        console.log(daysdiff);
+       
         let amount;
         if (disc !== "") {
           daysdiff - 1 > 1
@@ -1562,8 +1570,7 @@ if (calenderCont) {
           amount = data.amount * daysdiff;
         }
 
-        console.log(amount);
-        console.log(data.discount);
+       
 
         return {
           amount,
@@ -1615,7 +1622,7 @@ if (calenderCont) {
 
       setHall: function (data) {
         hall = data;
-        console.log(hall);
+       
       },
 
       getHall: function () {
@@ -1631,7 +1638,7 @@ if (calenderCont) {
           return m?.bookedFrom.split("-")[0] != "NaN";
         });
 
-        console.log(multiple);
+       
       },
 
       setMultiple: function (data) {
@@ -1663,7 +1670,7 @@ if (calenderCont) {
       },
 
       submitData: async function (options) {
-        console.log(options);
+       
         try {
           const res = await axios(
             {
@@ -1715,8 +1722,7 @@ if (calenderCont) {
           }
         }
 
-        console.log(dbStartDays);
-        console.log(dbBookedDays);
+       
       },
 
       convertBookedArr: function () {
@@ -1735,11 +1741,11 @@ if (calenderCont) {
           }
         });
 
-        console.log(dbBookedDays, dbStartDays);
+        
       },
 
       addDate: function (date, hall, cb) {
-        console.log(date);
+       
         try {
           // check if more than two days are selected
           if (bookingDates.length > 1) {
@@ -1767,7 +1773,7 @@ if (calenderCont) {
                     );
                   });
 
-                  console.log(isOvalapping);
+                  
 
                   try {
                     // throw error on overlapping dates
@@ -1909,7 +1915,7 @@ if (calenderCont) {
             url: `${window.location.protocol}//${window.location.host}/api/v1/bookingss/getavailability/halls/${hallname}/from/${from}/to/${to}`,
           });
 
-          console.log(res);
+         
           return res;
         } catch (error) {
           // showAlert('error', error.response.data.message);
@@ -1922,10 +1928,10 @@ if (calenderCont) {
           return div.id;
         });
 
-        console.log(bookedID.length);
+       
 
         if (bookingDates.length !== 1) {
-          console.log("entered is two");
+         
           booked.push({
             ...data,
             discount: +discount,
@@ -1934,7 +1940,7 @@ if (calenderCont) {
             bookedTo: this.convertWordToUtc(bookingDates[1]),
           });
         } else {
-          console.log("entered is one");
+          
           booked.push({
             ...data,
             discount: +discount,
@@ -1943,21 +1949,30 @@ if (calenderCont) {
             bookedTo: this.convertWordToUtc(bookedID[0]),
           });
         }
-        console.log(booked);
+      
         cb(booked);
       },
 
       convertWordToUtc: function (str) {
+        const monthShort =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         let val = new Date(str).toDateString().split(" ")[2];
+        let valOne = new Date(str).toDateString().split(" ")[1];
+        valOne = monthShort.indexOf(valOne)
+       
         let date = new Date(str);
-        val < 10
-          ? (date = `${date.getFullYear()}-0${
+        if((valOne + 1) < 10) {
+         
+          date = `${date.getFullYear()}-0${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`)
-          : (date = `${date.getFullYear()}-0${
+            }-${val}T00:00:00.000Z`
+
+        } else {
+         
+          date = `${date.getFullYear()}-${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`);
-        return date;
+            }-${val}T00:00:00.000Z`
+        }
+        return date
       },
 
       convertUtctoWord: function (str) {
@@ -2046,7 +2061,7 @@ if (calenderCont) {
           }`;
         }
 
-        console.log(val);
+       
 
         try {
           const res = await axios({
@@ -2086,7 +2101,7 @@ if (calenderCont) {
             },
             { withCredentials: true }
           );
-          console.log(res);
+         
           if (res.status === 201) {
             return res;
           }
@@ -2471,7 +2486,7 @@ if (calenderCont) {
         document.querySelectorAll(".calender__days div")
       );
 
-      console.log(newFilter);
+      
       modal.classList.remove("active");
       Array.from(document.querySelectorAll(".calender__days div")).forEach(
         (div) => {
@@ -2484,7 +2499,7 @@ if (calenderCont) {
                     calCtrl.convertWordToUtc(e.target.id)
                   )
                   .then((resp) => {
-                    console.log(resp);
+                    
                     modal.classList.add("active");
 
                     UIctrl.showModal(resp);
@@ -2543,7 +2558,7 @@ if (calenderCont) {
           calCtrl.clearBooked(
             Array.from(document.querySelectorAll(".calender__days div"))
           );
-          console.log(result.data.data[0]);
+          
           calCtrl.uploadBooked(result);
 
           calCtrl.convertBookedArr();
@@ -2593,7 +2608,7 @@ if (calenderCont) {
 
       let bookedDate = calCtrl.getBookingDates();
 
-      console.log(bookedDate);
+      
       // get the set date
       var date = calCtrl.returnDate();
 
@@ -2670,9 +2685,9 @@ if (calenderCont) {
         let bookedData = UIctrl.getBookedValue();
 
         for (const val in bookedData) {
-          console.log(val);
+          
           if (val === "clientName" && bookedData[val] === "") {
-            console.log("entered");
+            
             return UIctrl.showAlert("error", "Client Name cannot be empty");
           } else if (val === "clientTel" && bookedData[val] === "") {
             return UIctrl.showAlert("error", "Client Number cannot be empty");
@@ -2694,7 +2709,7 @@ if (calenderCont) {
           }
         }
 
-        console.log(bookedData);
+        
         calCtrl.setHall(bookedData.hallname);
 
         calCtrl.setMultiple(bookedData);
@@ -2705,7 +2720,7 @@ if (calenderCont) {
 
         calCtrl.submitData(multipleData).then((res) => {
           UIctrl.disableBtn();
-          console.log(res);
+          
           if (res?.data?.status === "success") {
             UIctrl.showAlert("success", "Booking successful");
             window.setTimeout(() => {
@@ -2799,16 +2814,25 @@ const calenderPageController = (function () {
     },
 
     convertWordToUtc: function (str) {
-      let val = new Date(str).toDateString().split(" ")[2];
-      let date = new Date(str);
-      val < 10
-        ? (date = `${date.getFullYear()}-0${
-            date.getMonth() + 1
-          }-${val}T00:00:00.000Z`)
-        : (date = `${date.getFullYear()}-0${
-            date.getMonth() + 1
-          }-${val}T00:00:00.000Z`);
-      return date;
+      const monthShort =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        let val = new Date(str).toDateString().split(" ")[2];
+        let valOne = new Date(str).toDateString().split(" ")[1];
+        valOne = monthShort.indexOf(valOne)
+       
+        let date = new Date(str);
+        if((valOne + 1) < 10) {
+          
+          date = `${date.getFullYear()}-0${
+              date.getMonth() + 1
+            }-${val}T00:00:00.000Z`
+
+        } else {
+          
+          date = `${date.getFullYear()}-${
+              date.getMonth() + 1
+            }-${val}T00:00:00.000Z`
+        }
+        return date
     },
 
     convertUtctoWord: function (str) {
@@ -3049,7 +3073,7 @@ const UIPageController = (function () {
 
     // set heafer month
     updateHeadOnArrPress: function (monthData) {
-      console.log(monthData);
+      
 
       const monthLong = [
         "January",
@@ -3080,7 +3104,7 @@ const UIPageController = (function () {
         "Nov",
         "Dec",
       ];
-      console.log(monthShort.includes(monthData));
+      
       calenderMonthH2
         ? (calenderMonthH2.innerHTML = monthLong[monthShort.indexOf(monthData)])
         : null;
@@ -3119,10 +3143,10 @@ var controller = (function (calCtrl, UIctrl) {
       )
       .then((res) => {
         calCtrl.setDbBooked(res);
-      //  console.log(res);
+      
         const cache = {};
         calCtrl.getBookedForRender().sort((a,b) => new Date(a.bookedFrom).getTime() - new Date(b.bookedFrom).getTime()).forEach((data, ind) => {
-          // console.log(data);
+          
           
           if (data.bookedFrom === data.bookedTo) {
             dayDate
@@ -3140,7 +3164,7 @@ var controller = (function (calCtrl, UIctrl) {
                       }
 
                       cache[p.id]= data.hallname;
-                      console.log(cache);
+                     
                                         
                     // console.log("inside " + p.id);
                   }
@@ -3299,16 +3323,25 @@ if (document.querySelector(".tab")) {
         }
       },
       convertWordToUtc = (str) => {
+        const monthShort =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         let val = new Date(str).toDateString().split(" ")[2];
+        let valOne = new Date(str).toDateString().split(" ")[1];
+        valOne = monthShort.indexOf(valOne)
+        
         let date = new Date(str);
-        val < 10
-          ? (date = `${date.getFullYear()}-0${
+        if((valOne + 1) < 10) {
+          
+          date = `${date.getFullYear()}-0${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`)
-          : (date = `${date.getFullYear()}-0${
+            }-${val}T00:00:00.000Z`
+
+        } else {
+          
+          date = `${date.getFullYear()}-${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`);
-        return date;
+            }-${val}T00:00:00.000Z`
+        }
+        return date
       };
 
     convertUtctoWord = (str) => {
@@ -3508,7 +3541,7 @@ if (document.querySelector(".tab")) {
       // console.log(queryVal,inputFilter.value);
 
       getUnfiltered2(rangeFrom.value, rangeTo.value).then((data) => {
-        console.log(data.data.booking);
+        
         showQuotesF(data.data.booking);
       });
     };
@@ -3578,16 +3611,25 @@ if (document.querySelector(".bin")) {
         }
       },
       convertWordToUtc = (str) => {
+        const monthShort =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         let val = new Date(str).toDateString().split(" ")[2];
+        let valOne = new Date(str).toDateString().split(" ")[1];
+        valOne = monthShort.indexOf(valOne)
+        
         let date = new Date(str);
-        val < 10
-          ? (date = `${date.getFullYear()}-0${
+        if((valOne + 1) < 10) {
+          
+          date = `${date.getFullYear()}-0${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`)
-          : (date = `${date.getFullYear()}-0${
+            }-${val}T00:00:00.000Z`
+
+        } else {
+          
+          date = `${date.getFullYear()}-${
               date.getMonth() + 1
-            }-${val}T00:00:00.000Z`);
-        return date;
+            }-${val}T00:00:00.000Z`
+        }
+        return date
       };
 
     convertUtctoWord = (str) => {
@@ -3720,7 +3762,7 @@ if (document.querySelector(".bin")) {
             // call the API to get quotes
             const response = await getQuotes(page, limit);
             // show quotes
-            console.log(response.data.data.bin);
+            
             showQuotes(response.data.data.bin);
             // update the total
             total = response.data.data.count;
@@ -3740,7 +3782,7 @@ if (document.querySelector(".bin")) {
       // console.log(queryVal,inputFilter.value);
 
       getUnfiltered(queryVal, inputFilterB.value).then((data) => {
-        console.log(data.data.data.bin);
+        
         showQuotesF(data.data.data.bin);
       });
     };
@@ -3950,7 +3992,7 @@ const deleteBin = async () => {
   })
 
   const res = await response.json()
-  console.log(res);
+  
 };
 deleteBin()
 // croneJob();

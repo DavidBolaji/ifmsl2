@@ -24,7 +24,7 @@ exports.getBookings = async (req, res, next) => {
 			// .sort()
 			// .select()
 			.pagination();
-		const bookings = await features.query.sort({createdAt: -1});
+		const bookings = await features.query.sort({updatedAt: -1});
 		
 		// BUILD TEMPLATE
 		// RENDER TEMPLATE

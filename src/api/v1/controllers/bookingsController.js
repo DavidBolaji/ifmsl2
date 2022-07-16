@@ -154,13 +154,17 @@ exports.createBooking = async (req, res, next) => {
 
 exports.multipleBooking = async (req, res, next) => {
   const arr = ["morning", "evening"];
+  
   const f = await Booking.find({
-    bookedFrom: {$lte:req.body[0].bookedFrom },
+    bookedFrom: {$gte:req.body[0].bookedFrom },
+    bookedTo: {$lte:req.body[0].bookedTo },
     hallname: req.body[0].hallname,
   });
 
+  
+
   for(let idx = 0;idx < f.length; idx++){
-    console.log(new Date(req.body[0].bookedFrom).getTime() == new Date(f[idx].bookedTo).getTime());
+    
     if(new Date(req.body[0].bookedFrom).getTime() === new Date(f[idx].bookedTo).getTime()) {
       if(f[idx]?.sessions?.length === 0) {
         return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
@@ -182,7 +186,7 @@ exports.multipleBooking = async (req, res, next) => {
         return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
       }
     } else if(new Date(f[idx].bookedFrom).getTime() <= new Date(req.body[0].bookedFrom).getTime() && new Date(f[idx].bookedTo).getTime() >= new Date(req.body[0].bookedFrom).getTime()) {
-        console.log('in-range');
+        
         return next(new CustomError(400, "Date is in range of dates and already booked\n please select a new date"));
     }
   
@@ -272,9 +276,7 @@ exports.updateBooking = async (req, res, next) => {
     '_id': {$ne: req.params.id}
   });
 
-  console.log(f);
 
-  
 
   const newF = f.map((r) => r.sessions[0]);
 
@@ -359,7 +361,7 @@ exports.deleteSingleBooking = async (req, res, next) => {
     if (user != bookBin[0].user) {
       return next(new CustomError(401, "Unauthorized"));
     }
-    console.log(bookBin);
+    
     if (bookBin) {
       const bin = await Bin.create({
         clientName: bookBin[0].clientName,
@@ -387,7 +389,7 @@ exports.deleteSingleBooking = async (req, res, next) => {
       return responseHandler(res, 204, null);
     }
   } catch (error) {
-    console.log(error);
+    
     return next(new CustomError(500, "Error processing request", error));
   }
 };
@@ -667,7 +669,7 @@ exports.deleteBin = async (req, res, next) => {
 
   const hall = await Booking.deleteMany({ bin: true });
 
-  console.log(hall);
+  
 
   if (!hall) {
     console.log('error');

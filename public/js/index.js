@@ -7,6 +7,7 @@ const hideAlert = () => {
   const el = document.querySelector(".alert");
   if (el) el.parentElement.removeChild(el);
 }; 
+
 const showAlert = (type, message, delayed) => {
   hideAlert();
   const markup = `<div class="alert alert__${type}">${message}</div>`;
@@ -389,7 +390,7 @@ async function createOneBook(options) {
         withCredentials: true,
       }
     );
-    console.log(res);
+    
     if (res.status === 201) {
       showAlert("success", "Booking successful");
       window.setTimeout(() => {
@@ -508,7 +509,7 @@ const groupheadDate = (dateGroup) => {
 const changeKey = (arrs) => {
   
   const bookedArr = arrs.map(arr => {
-    console.log(arrs, new Date(arr.bookedFrom));
+    
     return {
         id: arr._id,
         calendarId: arr._id,
